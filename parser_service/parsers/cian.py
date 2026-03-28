@@ -37,13 +37,16 @@ class CianParser(BaseParser):
             }
             try:
                 async with self.http.post(_API_URL, json=payload, headers=_HEADERS, timeout=aiohttp.ClientTimeout(total=15)) as resp:
-                    if resp.status == 429:
-                        logger.warning("cian: rate limited")
+                    if resp.status in (403, 429):
+                        logger.warning("cian: blocked (status %s), skipping", resp.status)
                         break
                     if resp.status != 200:
                         logger.error("cian: status %s", resp.status)
                         break
-                    data = await resp.json()
+                    data = await resp.json(content_type=None)
+                    if "offersSerialized" not in str(data.get("data", {})):
+                        logger.warning("cian: unexpected response (captcha?)")
+                        break
             except Exception as exc:
                 logger.exception("cian: fetch error page %s: %s", page, exc)
                 break

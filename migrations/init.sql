@@ -2,6 +2,17 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
+-- Enum types (pre-created so concurrent create_all calls don't race)
+DO $$ BEGIN
+    CREATE TYPE listing_status AS ENUM ('active', 'inactive', 'purged');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE sub_channel AS ENUM ('email', 'telegram', 'push');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
 -- Full-text search trigger for listings
 CREATE OR REPLACE FUNCTION listings_search_vector_update() RETURNS trigger AS $$
 BEGIN

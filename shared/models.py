@@ -91,7 +91,7 @@ class Listing(Base):
 
     # --- status / lifecycle ---
     status: Mapped[ListingStatus] = mapped_column(
-        Enum(ListingStatus, name="listing_status"),
+        Enum(ListingStatus, name="listing_status", values_callable=lambda obj: [e.value for e in obj], create_type=False),
         nullable=False,
         server_default=ListingStatus.ACTIVE.value,
         index=True,
@@ -187,7 +187,8 @@ class Subscription(Base):
     )
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     channel: Mapped[SubscriptionChannel] = mapped_column(
-        Enum(SubscriptionChannel, name="sub_channel"), nullable=False,
+        Enum(SubscriptionChannel, name="sub_channel", values_callable=lambda obj: [e.value for e in obj], create_type=False),
+        nullable=False,
     )
 
     # --- filter criteria (stored as JSON for flexibility) ---

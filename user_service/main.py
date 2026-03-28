@@ -4,15 +4,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from shared.database import engine
+from shared.database import create_tables, engine
 from shared.models import Base
 from user_service.routers import auth, favorites, subscriptions
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await create_tables(Base)
     yield
     await engine.dispose()
 

@@ -23,7 +23,7 @@ from parser_service.parsers.base import PARSER_REGISTRY
 from parser_service.phone_parser import AvitoPhoneParser
 from parser_service.publisher import EventPublisher
 from shared.config import settings
-from shared.database import AsyncSessionLocal, engine
+from shared.database import AsyncSessionLocal, create_tables, engine
 from shared.events import ListingDeactivatedEvent, ListingNewEvent
 from shared.models import Base, Listing, ListingStatus
 
@@ -120,8 +120,7 @@ async def run_daily_cleanup(publisher: EventPublisher) -> None:
 
 async def main() -> None:
     # Init DB tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await create_tables(Base)
 
     redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
     publisher = EventPublisher(redis_client)
