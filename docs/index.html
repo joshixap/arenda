@@ -94,6 +94,32 @@
     .step-text { font-size: .9rem; color: var(--muted); padding-top: 2px; }
     .step-text strong { color: var(--text); }
 
+    /* DEMO LISTINGS */
+    .demo-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .demo-badge { background: var(--badge); border: 1px solid var(--border); padding: .2rem .7rem;
+                  border-radius: 99px; font-size: .78rem; color: var(--accent2); }
+    .listings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .lcard { background: var(--badge); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+             transition: border-color .2s, transform .2s; }
+    .lcard:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .lcard-img { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
+                 background: linear-gradient(135deg, #1a1d27 0%, #252838 100%); }
+    .lcard-body { padding: .9rem; }
+    .lcard-price { font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
+    .lcard-title { font-size: .88rem; font-weight: 600; margin: .2rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lcard-addr { font-size: .8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lcard-meta { display: flex; gap: .4rem; margin-top: .6rem; flex-wrap: wrap; }
+    .lcard-meta .badge { background: var(--card); border: 1px solid var(--border); padding: .1rem .45rem;
+                         border-radius: 4px; font-size: .73rem; color: var(--muted); }
+    .lcard-meta .badge.src { color: var(--accent); border-color: var(--accent); }
+    .pagination { display: flex; justify-content: center; gap: .4rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .pg-btn { background: var(--card); border: 1px solid var(--border); color: var(--text);
+              padding: .35rem .75rem; border-radius: 6px; font-size: .85rem; cursor: pointer; transition: all .15s; }
+    .pg-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+    .pg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+    .demo-note { text-align: center; margin-top: 1rem; font-size: .82rem; color: var(--muted); }
+    .demo-note a { color: var(--accent); text-decoration: none; }
+
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--muted); font-size: .85rem; }
     footer a { color: var(--accent); text-decoration: none; }
@@ -105,6 +131,7 @@
   <div class="logo">🏠 arenda</div>
   <div class="nav-links">
     <a href="#features">Функции</a>
+    <a href="#demo">Демо</a>
     <a href="#architecture">Архитектура</a>
     <a href="#api">API</a>
     <a href="#stack">Стек</a>
@@ -117,8 +144,8 @@
   <h1>Агрегатор аренды жилья</h1>
   <p>Автоматически собирает объявления с 7 площадок каждые 3 минуты, дедуплицирует их, и мгновенно уведомляет вас в Telegram по вашим фильтрам.</p>
   <div class="hero-btns">
-    <a class="btn btn-primary" href="https://github.com/joshixap/arenda" target="_blank">Смотреть на GitHub</a>
-    <a class="btn btn-outline" href="#api">API документация</a>
+    <a class="btn btn-primary" href="http://108.165.173.64/app" target="_blank">Открыть объявления ↗</a>
+    <a class="btn btn-outline" href="https://github.com/joshixap/arenda" target="_blank">GitHub ↗</a>
   </div>
   <div class="sources">
     <div class="source-tag"><span>●</span>avito.ru</div>
@@ -231,6 +258,17 @@
   </div>
 </section>
 
+<section id="demo">
+  <h2>Демо <em>объявлений</em></h2>
+  <div class="demo-bar">
+    <div class="demo-badge">📋 Демо-данные — реальный вид карточек</div>
+    <a class="btn btn-primary" style="font-size:.85rem; padding:.4rem 1rem" href="http://108.165.173.64/app" target="_blank">Открыть живую версию ↗</a>
+  </div>
+  <div id="demo-grid" class="listings-grid"></div>
+  <div id="demo-pagination" class="pagination"></div>
+  <p class="demo-note">Живая версия с реальными данными: <a href="http://108.165.173.64/app" target="_blank">108.165.173.64/app</a></p>
+</section>
+
 <section id="api">
   <h2>REST <em>API</em></h2>
 
@@ -287,6 +325,77 @@ docker compose up</pre>
 <footer>
   <p>Arenda — асинхронный агрегатор аренды жилья &nbsp;·&nbsp; <a href="https://github.com/joshixap/arenda">GitHub</a></p>
 </footer>
+
+<script>
+(function() {
+  const DEMO = [
+    { price:55000, title:"2-комн. квартира, 58 м²", addr:"Москва, ул. Тверская, 12", rooms:2, area:58, floor:"4/9", src:"avito", icon:"🏠", seen:["avito","cian"] },
+    { price:38000, title:"1-комн. квартира, 38 м²", addr:"Санкт-Петербург, Невский пр., 45", rooms:1, area:38, floor:"3/5", src:"cian", icon:"🏢", seen:["cian"] },
+    { price:72000, title:"3-комн. квартира, 85 м²", addr:"Москва, Кутузовский пр., 33", rooms:3, area:85, floor:"7/16", src:"domclick", icon:"🏙️", seen:["domclick"] },
+    { price:28000, title:"Студия, 24 м²", addr:"Санкт-Петербург, ул. Рубинштейна, 7", rooms:0, area:24, floor:"2/4", src:"avito", icon:"🏠", seen:["avito","yandex"] },
+    { price:95000, title:"4-комн. квартира, 110 м²", addr:"Москва, Патриаршие пруды, 5", rooms:4, area:110, floor:"5/6", src:"cian", icon:"🏛️", seen:["cian"] },
+    { price:42000, title:"1-комн. квартира, 42 м²", addr:"Новосибирск, ул. Ленина, 21", rooms:1, area:42, floor:"6/9", src:"n1", icon:"🏘️", seen:["n1"] },
+    { price:65000, title:"2-комн. квартира, 65 м²", addr:"Екатеринбург, ул. Малышева, 8", rooms:2, area:65, floor:"3/12", src:"avito", icon:"🏢", seen:["avito"] },
+    { price:33000, title:"1-комн. квартира, 35 м²", addr:"Санкт-Петербург, пр. Просвещения, 14", rooms:1, area:35, floor:"9/12", src:"cian", icon:"🏗️", seen:["cian","domclick"] },
+    { price:48000, title:"2-комн. квартира, 52 м²", addr:"Москва, ул. Профсоюзная, 76", rooms:2, area:52, floor:"2/5", src:"yandex", icon:"🏠", seen:["yandex"] },
+    { price:25000, title:"Студия, 22 м²", addr:"Новосибирск, Красный пр., 60", rooms:0, area:22, floor:"4/10", src:"n1", icon:"🏙️", seen:["n1"] },
+    { price:80000, title:"3-комн. квартира, 90 м²", addr:"Москва, Сретенский б-р, 3", rooms:3, area:90, floor:"6/8", src:"domclick", icon:"🏛️", seen:["domclick","cian"] },
+    { price:36000, title:"1-комн. квартира, 40 м²", addr:"Казань, ул. Баумана, 19", rooms:1, area:40, floor:"1/9", src:"avito", icon:"🏘️", seen:["avito"] },
+    { price:58000, title:"2-комн. квартира, 60 м²", addr:"Краснодар, ул. Красная, 45", rooms:2, area:60, floor:"3/7", src:"cian", icon:"🏢", seen:["cian"] },
+    { price:45000, title:"2-комн. квартира, 55 м²", addr:"Нижний Новгород, пр. Ленина, 12", rooms:2, area:55, floor:"5/9", src:"avito", icon:"🏠", seen:["avito","domclick"] },
+    { price:31000, title:"1-комн. квартира, 36 м²", addr:"Ростов-на-Дону, пр. Ворошиловский, 33", rooms:1, area:36, floor:"7/14", src:"yandex", icon:"🏗️", seen:["yandex"] },
+  ];
+
+  const PER_PAGE = 6;
+  let page = 1;
+  const totalPages = Math.ceil(DEMO.length / PER_PAGE);
+
+  function render() {
+    const start = (page - 1) * PER_PAGE;
+    const items = DEMO.slice(start, start + PER_PAGE);
+    const grid = document.getElementById('demo-grid');
+    grid.innerHTML = items.map(d => `
+      <div class="lcard">
+        <div class="lcard-img">${d.icon}</div>
+        <div class="lcard-body">
+          <div class="lcard-price">${d.price.toLocaleString('ru')} ₽/мес</div>
+          <div class="lcard-title">${d.title}</div>
+          <div class="lcard-addr">📍 ${d.addr}</div>
+          <div class="lcard-meta">
+            <span class="badge">${d.rooms || 'Студия'}${d.rooms ? '-комн.' : ''}</span>
+            <span class="badge">${d.area} м²</span>
+            <span class="badge">${d.floor} эт.</span>
+            <span class="badge src">${d.src}</span>
+            ${d.seen.length > 1 ? `<span class="badge" title="Также на: ${d.seen.join(', ')}">+${d.seen.length - 1}</span>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+
+    const pg = document.getElementById('demo-pagination');
+    pg.innerHTML = '';
+    const prev = document.createElement('button');
+    prev.className = 'pg-btn'; prev.textContent = '←'; prev.disabled = page === 1;
+    prev.onclick = () => { page--; render(); document.getElementById('demo').scrollIntoView({behavior:'smooth'}); };
+    pg.appendChild(prev);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const b = document.createElement('button');
+      b.className = 'pg-btn' + (i === page ? ' active' : '');
+      b.textContent = i;
+      const p = i;
+      b.onclick = () => { page = p; render(); document.getElementById('demo').scrollIntoView({behavior:'smooth'}); };
+      pg.appendChild(b);
+    }
+
+    const next = document.createElement('button');
+    next.className = 'pg-btn'; next.textContent = '→'; next.disabled = page === totalPages;
+    next.onclick = () => { page++; render(); document.getElementById('demo').scrollIntoView({behavior:'smooth'}); };
+    pg.appendChild(next);
+  }
+
+  render();
+})();
+</script>
 
 </body>
 </html>
