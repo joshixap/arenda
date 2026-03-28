@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arenda — Асинхронный агрегатор аренды жилья</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --border: #2a2d3e;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --badge: #252838;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(15,17,23,0.92); backdrop-filter: blur(10px);
+          border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .logo { font-size: 1.2rem; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+    .nav-links a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: .9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero { padding: 6rem 2rem 4rem; text-align: center; max-width: 860px; margin: 0 auto; }
+    .hero-badge { display: inline-block; background: var(--badge); border: 1px solid var(--border);
+                  padding: .3rem .9rem; border-radius: 99px; font-size: .8rem; color: var(--accent2); margin-bottom: 1.5rem; }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -1px;
+               background: linear-gradient(135deg, #fff 30%, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { margin-top: 1rem; font-size: 1.1rem; color: var(--muted); max-width: 600px; margin-left: auto; margin-right: auto; }
+    .hero-btns { margin-top: 2.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn { padding: .65rem 1.5rem; border-radius: 8px; text-decoration: none; font-size: .95rem; font-weight: 600; transition: all .2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #5a52d5; }
+    .btn-outline { border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* SOURCES */
+    .sources { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; margin-top: 2rem; }
+    .source-tag { background: var(--card); border: 1px solid var(--border); padding: .3rem .8rem;
+                  border-radius: 6px; font-size: .8rem; color: var(--muted); }
+    .source-tag span { color: var(--accent2); margin-right: .3rem; }
+
+    /* SECTION */
+    section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+    section h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 2rem; }
+    section h2 em { color: var(--accent); font-style: normal; }
+
+    /* FEATURES GRID */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;
+            transition: border-color .2s, transform .2s; }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card-icon { font-size: 1.8rem; margin-bottom: .8rem; }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .card p { font-size: .88rem; color: var(--muted); }
+
+    /* ARCHITECTURE */
+    .arch { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; overflow-x: auto; }
+    .arch-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .arch-node { background: var(--badge); border: 1px solid var(--border); border-radius: 8px;
+                 padding: .4rem 1rem; font-size: .85rem; white-space: nowrap; }
+    .arch-node.accent { border-color: var(--accent); color: var(--accent); }
+    .arch-node.green { border-color: var(--accent2); color: var(--accent2); }
+    .arch-arrow { color: var(--muted); font-size: .9rem; }
+
+    /* API TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th { text-align: left; padding: .6rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-weight: 500; }
+    td { padding: .55rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .method { display: inline-block; padding: .15rem .5rem; border-radius: 4px; font-size: .78rem; font-weight: 700; font-family: monospace; }
+    .get { background: #0d3b2e; color: #00d4aa; }
+    .post { background: #2a1f4a; color: #a78bfa; }
+    .del { background: #3b1414; color: #f87171; }
+    .patch { background: #2a2a14; color: #fbbf24; }
+    code { background: var(--badge); padding: .1rem .4rem; border-radius: 4px; font-family: monospace; font-size: .85em; }
+
+    /* TECH STACK */
+    .stack { display: flex; flex-wrap: wrap; gap: .8rem; }
+    .tech { display: flex; align-items: center; gap: .5rem; background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: .5rem 1rem; font-size: .88rem; }
+    .tech-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* DEDUP FLOW */
+    .flow { display: flex; flex-direction: column; gap: .8rem; }
+    .flow-step { display: flex; align-items: flex-start; gap: 1rem; }
+    .step-num { background: var(--accent); color: #fff; width: 24px; height: 24px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+    .step-text { font-size: .9rem; color: var(--muted); padding-top: 2px; }
+    .step-text strong { color: var(--text); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--muted); font-size: .85rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🏠 arenda</div>
+  <div class="nav-links">
+    <a href="#features">Функции</a>
+    <a href="#architecture">Архитектура</a>
+    <a href="#api">API</a>
+    <a href="#stack">Стек</a>
+    <a href="https://github.com/YOUR_USERNAME/arenda" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">⚡ Асинхронный · Микросервисный · Real-time</div>
+  <h1>Агрегатор аренды жилья</h1>
+  <p>Автоматически собирает объявления с 7 площадок каждые 3 минуты, дедуплицирует их, и мгновенно уведомляет вас в Telegram по вашим фильтрам.</p>
+  <div class="hero-btns">
+    <a class="btn btn-primary" href="https://github.com/YOUR_USERNAME/arenda" target="_blank">Смотреть на GitHub</a>
+    <a class="btn btn-outline" href="#api">API документация</a>
+  </div>
+  <div class="sources">
+    <div class="source-tag"><span>●</span>avito.ru</div>
+    <div class="source-tag"><span>●</span>cian.ru</div>
+    <div class="source-tag"><span>●</span>domclick.ru</div>
+    <div class="source-tag"><span>●</span>realty.yandex.ru</div>
+    <div class="source-tag"><span>●</span>n1.ru</div>
+    <div class="source-tag"><span>●</span>youla.io</div>
+    <div class="source-tag"><span>●</span>move.ru</div>
+  </div>
+</div>
+
+<section id="features">
+  <h2>Ключевые <em>возможности</em></h2>
+  <div class="grid">
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>Асинхронный парсинг</h3>
+      <p>7 независимых воркеров собирают объявления каждые 3 минуты. При сбое одного — остальные продолжают работу.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <h3>Дедупликация</h3>
+      <p>SHA-256 хеш(адрес + площадь + цена). Одно объявление на нескольких площадках → одна запись, поле <code>seen_on[]</code> хранит все источники.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔔</div>
+      <h3>Telegram-уведомления</h3>
+      <p>Создайте подписку с фильтрами (город, цена, комнаты, источник). Бот пришлёт сообщение сразу при появлении нового объявления.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗺️</div>
+      <h3>Карта объявлений</h3>
+      <p>Endpoint <code>/listings/map</code> возвращает координаты для Leaflet.js. Карта обновляется вместе с базой.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧹</div>
+      <h3>Авто-очистка</h3>
+      <p>Снятые объявления помечаются <code>inactive</code>. Через 3 дня Cleanup Worker удаляет их из БД — каскадом из избранного.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📞</div>
+      <h3>Парсинг телефонов</h3>
+      <p>Асинхронный модуль извлекает номер телефона продавца через Avito Mobile API и сохраняет в карточке объявления.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧩</div>
+      <h3>Расширяемость</h3>
+      <p>Новый источник = один новый файл <code>parsers/mysource.py</code>. Авторегистрация через metaclass. Нет изменений в остальном коде.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔍</div>
+      <h3>Полнотекстовый поиск</h3>
+      <p>PostgreSQL <code>tsvector</code> + <code>GIN</code>-индекс. <code>QueryBuilder</code> по паттерну OCP — добавление фильтра = новый класс.</p>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <h2>Архитектура <em>системы</em></h2>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-node accent">Frontend (Next.js)</div>
+      <div class="arch-arrow">→ HTTPS →</div>
+      <div class="arch-node accent">API Gateway (Nginx)</div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-arrow" style="margin-left:2rem">↓ HTTP ↓</div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-node">User Service :8001</div>
+      <div class="arch-node">Listing Service :8002</div>
+      <div class="arch-node green">Parser Service</div>
+      <div class="arch-node green">Notification Service</div>
+    </div>
+    <div class="arch-row">
+      <div class="arch-node">User DB (PostgreSQL)</div>
+      <div class="arch-node">Listing DB (PostgreSQL + GIN)</div>
+      <div class="arch-node accent">Redis Streams</div>
+    </div>
+    <div style="margin-top:1rem; font-size:.85rem; color:var(--muted)">
+      Parser Service → <code>listing.new</code> → Redis → Notification Service → Telegram Bot API
+    </div>
+  </div>
+
+  <div style="margin-top:2rem">
+    <h3 style="margin-bottom:1rem; font-size:1rem; font-weight:600">Логика дедупликации</h3>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Воркер получает объявление и вычисляет <strong>dedup_hash</strong> = sha256(address + area + price)</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>INSERT ... ON CONFLICT (dedup_hash)</strong> — атомарный upsert без локов на уровне приложения</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Новое:</strong> вставка полной записи, source = источник-первооткрыватель, seen_on = [source]</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Дубль:</strong> только seen_on обновляется через <code>unnest + DISTINCT</code>. Оригинальный source не меняется</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">5</div>
+        <div class="step-text">PostgreSQL <strong>xmax = 0</strong> trick: одним запросом определяем INSERT vs UPDATE без второго round-trip</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="api">
+  <h2>REST <em>API</em></h2>
+
+  <h3 style="margin-bottom:.8rem; font-size:.95rem; color:var(--muted)">User Service — :8001</h3>
+  <table style="margin-bottom:2rem">
+    <tr><th>Метод</th><th>Путь</th><th>Описание</th></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/users/register</code></td><td>Регистрация</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/users/login</code></td><td>Вход, получение JWT</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/users/me</code></td><td>Профиль пользователя</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/favorites</code></td><td>Список избранного</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/favorites/{listing_id}</code></td><td>Добавить в избранное</td></tr>
+    <tr><td><span class="method del">DELETE</span></td><td><code>/favorites/{listing_id}</code></td><td>Удалить из избранного</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/subscriptions</code></td><td>Список подписок</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/subscriptions</code></td><td>Создать подписку</td></tr>
+    <tr><td><span class="method patch">PATCH</span></td><td><code>/subscriptions/{id}</code></td><td>Обновить / вкл / выкл</td></tr>
+    <tr><td><span class="method del">DELETE</span></td><td><code>/subscriptions/{id}</code></td><td>Удалить подписку</td></tr>
+  </table>
+
+  <h3 style="margin-bottom:.8rem; font-size:.95rem; color:var(--muted)">Listing Service — :8002</h3>
+  <table>
+    <tr><th>Метод</th><th>Путь</th><th>Описание</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/listings</code></td><td>Поиск с фильтрами и пагинацией</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/listings/{id}</code></td><td>Карточка объявления</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/listings/map</code></td><td>Координаты для карты</td></tr>
+  </table>
+</section>
+
+<section id="stack">
+  <h2>Технологический <em>стек</em></h2>
+  <div class="stack">
+    <div class="tech"><div class="tech-dot" style="background:#3776ab"></div>Python 3.12</div>
+    <div class="tech"><div class="tech-dot" style="background:#009688"></div>FastAPI</div>
+    <div class="tech"><div class="tech-dot" style="background:#336791"></div>PostgreSQL 16</div>
+    <div class="tech"><div class="tech-dot" style="background:#dc382d"></div>Redis 7 Streams</div>
+    <div class="tech"><div class="tech-dot" style="background:#4caf50"></div>aiohttp + curl_cffi</div>
+    <div class="tech"><div class="tech-dot" style="background:#ff9800"></div>APScheduler</div>
+    <div class="tech"><div class="tech-dot" style="background:#673ab7"></div>SQLAlchemy 2.0 async</div>
+    <div class="tech"><div class="tech-dot" style="background:#2196f3"></div>Next.js 14</div>
+    <div class="tech"><div class="tech-dot" style="background:#4caf50"></div>Leaflet.js</div>
+    <div class="tech"><div class="tech-dot" style="background:#1565c0"></div>Docker Compose</div>
+    <div class="tech"><div class="tech-dot" style="background:#24292e"></div>GitHub Actions</div>
+  </div>
+
+  <div style="margin-top:2rem; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem;">
+    <h3 style="font-size:.95rem; margin-bottom:1rem; color:var(--muted)">Быстрый старт</h3>
+    <pre style="font-family:monospace; font-size:.88rem; color:var(--accent2); line-height:1.8">git clone https://github.com/YOUR_USERNAME/arenda
+cd arenda
+cp .env.example .env
+# Укажите TELEGRAM_BOT_TOKEN в .env
+docker compose up</pre>
+  </div>
+</section>
+
+<footer>
+  <p>Arenda — асинхронный агрегатор аренды жилья &nbsp;·&nbsp; <a href="https://github.com/YOUR_USERNAME/arenda">GitHub</a></p>
+</footer>
+
+</body>
+</html>

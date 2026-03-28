@@ -1,0 +1,105 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: arenda
+      POSTGRES_PASSWORD: arenda
+      POSTGRES_DB: arenda
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arenda"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  user_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: user_service
+    command: uvicorn user_service.main:app --host 0.0.0.0 --port 8001 --reload
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+    ports:
+      - "8001:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  listing_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: listing_service
+    command: uvicorn listing_service.main:app --host 0.0.0.0 --port 8002 --reload
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8002:8002"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  parser_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: parser_service
+    command: python -m parser_service.main
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      REDIS_URL: redis://redis:6379/0
+      PARSER_INTERVAL_MINUTES: "3"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+  notification_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE: notification_service
+    command: python -m notification_service.main
+    environment:
+      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      REDIS_URL: redis://redis:6379/0
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
