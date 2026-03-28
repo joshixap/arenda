@@ -28,8 +28,10 @@ import aiohttp
 
 logger = logging.getLogger(__name__)
 
-# Публичный ключ из gist DxDiagDx — работает без авторизации
-_AVITO_MOBILE_API_KEY = "af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir"
+# Публичный ключ Avito Mobile API (источник: https://gist.github.com/DxDiagDx/8043c081e7e28c8d3f43200dbb93f57d)
+# Можно переопределить через AVITO_PHONE_API_KEY в .env
+from shared.config import settings as _settings
+_AVITO_MOBILE_API_KEY = _settings.avito_phone_api_key or "af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir"
 _MOBILE_API_URL = "https://m.avito.ru/api/1/items/{offer_id}/phone"
 
 # spfa.ru API (Duff89) — требует ключ из конфига

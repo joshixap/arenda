@@ -21,9 +21,10 @@ class Settings(BaseSettings):
     telegram_bot_token: str = ""
 
     # Phone parsing
-    parse_phones: bool = False           # включить парсинг телефонов
-    spfa_api_key: str = ""               # API-ключ spfa.ru для batch-режима (опционально)
-    parser_proxy: str = ""               # HTTP-прокси для парсеров (опционально)
+    parse_phones: bool = False
+    spfa_api_key: str = ""
+    parser_proxy: str = ""
+    avito_phone_api_key: str = ""        # переопределяет публичный ключ Avito Mobile API
 
     # Parser schedule (minutes)
     parser_interval_minutes: int = 3

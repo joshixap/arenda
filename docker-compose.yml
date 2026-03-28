@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: arenda
-      POSTGRES_PASSWORD: arenda
-      POSTGRES_DB: arenda
+      POSTGRES_USER: ${POSTGRES_USER:-arenda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-arenda}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -34,7 +34,7 @@ services:
         SERVICE: user_service
     command: uvicorn user_service.main:app --host 0.0.0.0 --port 8001 --reload
     environment:
-      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-arenda}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-arenda}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-change-me}
     ports:
@@ -53,7 +53,7 @@ services:
         SERVICE: listing_service
     command: uvicorn listing_service.main:app --host 0.0.0.0 --port 8002 --reload
     environment:
-      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-arenda}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-arenda}
       REDIS_URL: redis://redis:6379/0
     ports:
       - "8002:8002"
@@ -71,7 +71,7 @@ services:
         SERVICE: parser_service
     command: python -m parser_service.main
     environment:
-      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-arenda}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-arenda}
       REDIS_URL: redis://redis:6379/0
       PARSER_INTERVAL_MINUTES: "3"
     depends_on:
@@ -90,7 +90,7 @@ services:
         SERVICE: notification_service
     command: python -m notification_service.main
     environment:
-      DATABASE_URL: postgresql+asyncpg://arenda:arenda@db:5432/arenda
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-arenda}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-arenda}
       REDIS_URL: redis://redis:6379/0
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
     depends_on:
